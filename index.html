@@ -1,12 +1,217 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="et">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
-    <title>Document</title>
+    <meta charset="utf-8" />
+    <title>Kirill Razmustov — Portfoolio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #050a09;
+            --bg-card: #0d1a17;
+            --text-bright: #e0fff4;
+            --text-muted: #8ba69c;
+            --accent-glow: #00ff88;
+            --accent-secondary: #00ccff;
+            --grad: linear-gradient(135deg, var(--accent-glow), var(--accent-secondary));
+            --shadow: 0 20px 50px rgba(0, 255, 136, 0.15);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text-bright);
+            line-height: 1.6;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(0, 255, 136, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(0, 204, 255, 0.05) 0px, transparent 50%);
+        }
+
+        header {
+            position: sticky; top: 0; z-index: 100;
+            backdrop-filter: blur(15px);
+            background: rgba(5, 10, 9, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1rem 0;
+        }
+
+        nav {
+            max-width: 1100px; margin: 0 auto;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 20px;
+        }
+
+        .brand { font-weight: 700; font-size: 1.2rem; color: var(--accent-glow); }
+        .menu { display: flex; gap: 2rem; list-style: none; }
+        .menu a { text-decoration: none; color: var(--text-muted); transition: 0.3s; }
+        .menu a:hover { color: var(--accent-glow); }
+
+        .hero {
+            max-width: 1100px; margin: 60px auto;
+            display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px;
+            padding: 0 20px; align-items: center;
+        }
+
+        .title {
+            font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.1; margin-bottom: 20px;
+            background: linear-gradient(to right, #fff, var(--accent-glow));
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+
+        .profile-card {
+            background: var(--bg-card); padding: 30px; border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: var(--shadow);
+            text-align: left;
+        }
+
+        .profile-card h2 {
+            margin: 10px 0;
+            font-size: 1.5rem;
+            color: #fff;
+        }
+
+        .avatar {
+            width: 80px; height: 80px; border-radius: 20px;
+            border: 2px solid var(--accent-glow); margin-bottom: 15px;
+            animation: float 4s ease-in-out infinite;
+            object-fit: cover;
+        }
+
+        /* Обновленная секция работ */
+        .works {
+            max-width: 1100px; margin: 40px auto;
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+            gap: 20px; padding: 0 20px;
+        }
+
+        .work-link { text-decoration: none; color: inherit; display: block; }
+
+        .mini-card {
+            background: var(--bg-card); padding: 25px; border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05); transition: 0.3s;
+            height: 100%;
+        }
+        .mini-card:hover { 
+            transform: translateY(-10px); 
+            border-color: var(--accent-glow);
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.1);
+        }
+        .mini-card h3 { color: var(--accent-glow); margin-bottom: 10px; }
+        .mini-card p { font-size: 0.9rem; color: var(--text-muted); }
+
+        .button-section {
+            max-width: 1100px; margin: 60px auto;
+            display: flex; justify-content: center; gap: 30px; padding: 0 20px;
+        }
+
+        .box {
+            width: 130px; height: 130px; border-radius: 25px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; color: #000; cursor: pointer;
+            background: var(--grad); box-shadow: 0 10px 25px rgba(0, 255, 136, 0.2);
+        }
+
+        .pulse { animation: pulse 1.8s infinite; }
+        .bounce { animation: bounce 1.2s infinite; }
+        .shimmer { position: relative; overflow: hidden; }
+
+        .shimmer::after {
+            content: ""; position: absolute; top: 0; left: -150%;
+            width: 100%; height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shimmer 2.5s infinite;
+        }
+
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        @keyframes shimmer { 0% { left: -150%; } 100% { left: 150%; } }
+
+        @media (max-width: 850px) {
+            .hero, .works, .button-section { grid-template-columns: 1fr; flex-direction: column; align-items: center; text-align: center; }
+            .menu { display: none; }
+            .profile-card { text-align: center; }
+        }
+    </style>
 </head>
 <body>
-    <h1>Tuleb varsti</h1>
+
+    <header>
+        <nav>
+            <div class="brand">K.Razmustov</div>
+            <ul class="menu">
+                <li><a href="#about">Minust</a></li>
+                <li><a href="#works">Tööd</a></li>
+                <li><a href="#buttons">Efektid</a></li>
+            </ul>
+            <a href="mailto:your@email.com" style="padding: 10px 20px; background: var(--grad); border-radius: 10px; color: #000; text-decoration: none; font-weight: 700;">Kontakt</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="content">
+                <h1 class="title">Loon digitaalseid lahendusi, mis on kiired ja puhtad</h1>
+                <p style="color: var(--text-muted); margin-bottom: 25px;">HTML, CSS ja kaasaegne UI/UX disain otse Figmast koodi.</p>
+                <div style="display: flex; gap: 15px;">
+                    <a href="#works" style="padding: 12px 25px; border-radius: 12px; background: var(--grad); border: none; font-weight: 700; cursor: pointer; text-decoration: none; color: #000;">Vaata töid</a>
+                    <button style="padding: 12px 25px; border-radius: 12px; background: transparent; border: 1px solid var(--text-muted); color: #fff; cursor: pointer;">Loe veel</button>
+                </div>
+            </div>
+            
+            <article class="profile-card" id="about">
+                <img src="https://cdn.pixabay.com/photo/2025/06/11/13/19/ai-generated-9654480_1280.png" alt="Avatar" class="avatar">
+                <br>
+                <span style="background: rgba(0,255,136,0.1); color: var(--accent-glow); padding: 4px 10px; border-radius: 6px; font-size: 0.8rem;">#veebilooja</span>
+                <h2>Kirill Razmustov</h2>
+                <p style="color: var(--text-muted);">Mulle meeldib puhas kood, Figma prototüübid ja ilmekas tüpograafia.</p>
+            </article>
+        </section>
+
+        <section class="works" id="works">
+            <a href="https://www.figma.com/design/7r5AzmOk1kbekIy4j9dW7T/Dribble?m=auto&t=hapVIz2KNG15Nrgz-6" target="_blank" class="work-link">
+                <div class="mini-card">
+                    <h3>Dribble Design</h3>
+                    <p>Portfoolio konsept ja visuaalne stiil. UX-uuringud ja UI-elemendid.</p>
+                </div>
+            </a>
+
+            <a href="https://www.figma.com/design/iEtI6mDC1zRWuRQDYksigw/FoodApp2?m=auto&t=hapVIz2KNG15Nrgz-6" target="_blank" class="work-link">
+                <div class="mini-card">
+                    <h3>FoodApp v2</h3>
+                    <p>Toidu tellimise rakenduse täiustatud disain ja kasutajateekond.</p>
+                </div>
+            </a>
+
+            <a href="https://www.figma.com/design/j71GphSDXaHQZOCmLmCMSR/Untitled?m=auto&t=hapVIz2KNG15Nrgz-6" target="_blank" class="work-link">
+                <div class="mini-card">
+                    <h3>Eksperimentaalne projekt</h3>
+                    <p>Uue brändingu ja veebiliidese kontseptsioon (Untitled).</p>
+                </div>
+            </a>
+
+            <a href="https://www.figma.com/design/JgP9qpBhPFNVWCIVXWkejQ/FoodApp?m=auto&t=hapVIz2KNG15Nrgz-6" target="_blank" class="work-link">
+                <div class="mini-card">
+                    <h3>FoodApp Concept</h3>
+                    <p>Mobiilirakenduse prototüüp toidu kohaletoimetamiseks.</p>
+                </div>
+            </a>
+        </section>
+
+        <section class="button-section" id="buttons">
+            <div class="box pulse">Pulss</div>
+            <div class="box bounce">Hüpe</div>
+            <div class="box shimmer">Läige</div>
+        </section>
+    </main>
+
+    <footer style="text-align: center; padding: 40px; border-top: 1px solid rgba(255,255,255,0.05); color: var(--text-muted);">
+        © 2026 Kirill Razmustov — tehtud armastusega CSS-i ja Figma vastu
+    </footer>
+
 </body>
 </html>
