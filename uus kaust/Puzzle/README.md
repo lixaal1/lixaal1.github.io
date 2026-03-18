@@ -14,7 +14,6 @@ Interaktiivne puslemang, kus pilt loigatakse tuukkideks ja kasutaja paneb selle 
 - Win Explosion osakeste ilutulestik.
 - Taustamuusika valik (Web Audio).
 - Taimer, liidrite tabel ja rekordi JSON eksport.
-- Lingid portfolio pealehele ja GitHub repo-le.
 
 ## Kasutamine lokaalselt
 
