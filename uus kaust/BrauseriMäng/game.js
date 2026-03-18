@@ -40,37 +40,11 @@ const DIFFICULTY_SETTINGS = {
 const SCREEN_SHAKE_DURATION = 200; // ms
 const SCREEN_SHAKE_INTENSITY = 10; // pixels
 
-// ============ LEADERBOARD FUNCTIONS ============
-function getLeaderboard() {
-    const data = localStorage.getItem('canvas_apocalypse_leaderboard');
-    return data ? JSON.parse(data) : [];
-}
-
-function saveScoreToLeaderboard(username, score, timeSurvived) {
-    const leaderboard = getLeaderboard();
-    leaderboard.push({
-        username: username,
-        score: Math.floor(score),
-        timeSurvived: Math.floor(timeSurvived),
-        date: new Date().toLocaleDateString()
-    });
-    
-    // Sort by score descending
-    leaderboard.sort((a, b) => b.score - a.score);
-    
-    // Keep only top 50
-    leaderboard.splice(50);
-    
-    localStorage.setItem('canvas_apocalypse_leaderboard', JSON.stringify(leaderboard));
-}
-
 // ============ GAME STATE ============
 const gameState = {
-    // States: MENU, REGISTER, PLAY, GAME_OVER, LEADERBOARD
+    // States: MENU, PLAY, GAME_OVER
     state: 'MENU',
     selectedDifficulty: 'MEDIUM',
-    username: '',
-    inputBuffer: '',
     
     // Player
     player: {
@@ -107,6 +81,9 @@ const gameState = {
     
     // Difficulty timing
     difficultyTimer: 0
+    ,
+    // Player name
+    currentPlayerName: null
 };
 
 // Keyboard input
@@ -137,6 +114,18 @@ function init() {
     
     // Initialize background dots
     initializeBackgroundDots();
+    
+    // Show buttons when returning to menu
+    showInfoPanel();
+
+    // Load persisted player name
+    try {
+        const savedName = localStorage.getItem('canvas_apocalypse_username');
+        gameState.currentPlayerName = savedName || null;
+        document.getElementById('playerNameDisplay').textContent = gameState.currentPlayerName || 'Guest';
+    } catch (e) {
+        gameState.currentPlayerName = null;
+    }
 }
 
 function initializeBackgroundDots() {
@@ -165,6 +154,9 @@ function startGame(difficulty) {
     gameState.difficultyTimer = 0;
     gameState.screenShake.active = false;
     
+    // Hide buttons during gameplay
+    hideInfoPanel();
+    
     const settings = DIFFICULTY_SETTINGS[difficulty];
     gameState.currentSpawnInterval = settings.initialSpawnInterval;
     gameState.currentEnemySpeed = settings.baseEnemySpeed;
@@ -182,55 +174,16 @@ function startGame(difficulty) {
 document.addEventListener('keydown', (e) => {
     keysPressed[e.key.toLowerCase()] = true;
     
-    // Registration input
-    if (gameState.state === 'REGISTER') {
-        if (e.key === 'Enter' && gameState.inputBuffer.trim().length > 0) {
-            gameState.username = gameState.inputBuffer.trim();
-            gameState.inputBuffer = '';
-            gameState.state = 'MENU';
-        } else if (e.key === 'Backspace') {
-            gameState.inputBuffer = gameState.inputBuffer.slice(0, -1);
-        } else if (e.key.length === 1 && gameState.inputBuffer.length < 15) {
-            gameState.inputBuffer += e.key;
-        }
-        return;
-    }
-    
-    // Leaderboard navigation
-    if (gameState.state === 'LEADERBOARD') {
-        if (e.key === 'Escape' || e.key === 'l' || e.key === 'L') {
-            gameState.state = 'MENU';
-        }
-        return;
-    }
-    
     // Menu selection
     if (gameState.state === 'MENU') {
-        if (e.key === '1') {
-            startGame('EASY');
-            return;
-        }
-        if (e.key === '2') {
-            startGame('MEDIUM');
-            return;
-        }
-        if (e.key === '3') {
-            startGame('HARD');
-            return;
-        }
-        if (e.key === 'r' || e.key === 'R') {
-            gameState.state = 'REGISTER';
-            return;
-        }
-        if (e.key === 'l' || e.key === 'L') {
-            gameState.state = 'LEADERBOARD';
-            return;
-        }
+        if (e.key === '1') startGame('EASY');
+        if (e.key === '2') startGame('MEDIUM');
+        if (e.key === '3') startGame('HARD');
     }
     
     // Restart
     if (gameState.state === 'GAME_OVER' && e.key.toLowerCase() === 'r') {
-        gameState.state = 'MENU';
+        init();
     }
 });
 
@@ -325,15 +278,10 @@ function checkCollisions() {
             // Collision detected!
             gameState.state = 'GAME_OVER';
             
-            // Save to leaderboard if username is set
-            if (gameState.username) {
-                saveScoreToLeaderboard(gameState.username, gameState.score, gameState.timeSurvived);
-            }
-            
             // Check if new high score
-            if (gameState.score > gameState.highScore) {
-                gameState.highScore = gameState.score;
-                localStorage.setItem('canvas_apocalypse_highscore', gameState.score);
+            if (Math.floor(gameState.score) > Math.floor(gameState.highScore)) {
+                gameState.highScore = Math.floor(gameState.score);
+                localStorage.setItem('canvas_apocalypse_highscore', gameState.highScore);
             }
             
             // Trigger screen shake and particle explosion
@@ -516,10 +464,10 @@ function drawGameOverScreen() {
     
     ctx.fillStyle = '#00ff41';
     ctx.font = '24px Courier New';
-    ctx.fillText(`SCORE: ${gameState.score}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 20);
+    ctx.fillText(`SCORE: ${Math.floor(gameState.score)}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 20);
     ctx.fillText(`TIME SURVIVED: ${Math.floor(gameState.timeSurvived)}s`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 60);
     
-    if (gameState.score === gameState.highScore && gameState.score > 0) {
+    if (Math.floor(gameState.score) >= Math.floor(gameState.highScore) && Math.floor(gameState.score) > 0) {
         ctx.fillStyle = '#ffff00';
         ctx.font = 'bold 20px Arial';
         ctx.fillText('NEW HIGH SCORE!', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 100);
@@ -528,106 +476,6 @@ function drawGameOverScreen() {
     
     ctx.font = '18px Courier New';
     ctx.fillText('Press R to restart', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 140);
-}
-
-function drawRegistrationScreen() {
-    // Semi-transparent overlay
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
-    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-    
-    ctx.fillStyle = '#00ff41';
-    ctx.font = 'bold 40px Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    
-    ctx.fillText('ENTER USERNAME', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 60);
-    
-    // Input box
-    ctx.fillStyle = '#00ff41';
-    ctx.strokeStyle = '#00ff41';
-    ctx.lineWidth = 2;
-    ctx.fillRect(CANVAS_WIDTH / 2 - 150, CANVAS_HEIGHT / 2 + 10, 300, 40);
-    
-    // Input text
-    ctx.fillStyle = '#000000';
-    ctx.font = '24px Courier New';
-    ctx.fillText(gameState.inputBuffer || '_', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 30);
-    
-    // Instructions
-    ctx.fillStyle = '#ffff00';
-    ctx.font = '16px Courier New';
-    ctx.fillText('Type your username (max 15 chars)', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 80);
-    
-    ctx.fillStyle = '#00ff41';
-    ctx.font = '14px Courier New';
-    ctx.fillText('Press Enter to confirm', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 110);
-}
-
-function drawLeaderboardScreen() {
-    // Semi-transparent overlay
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.95)';
-    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-    
-    ctx.fillStyle = '#00ff41';
-    ctx.font = 'bold 40px Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
-    
-    ctx.fillText('LEADERBOARD', CANVAS_WIDTH / 2, 20);
-    
-    const leaderboard = getLeaderboard();
-    
-    if (leaderboard.length === 0) {
-        ctx.fillStyle = '#ffff00';
-        ctx.font = '20px Courier New';
-        ctx.fillText('No scores yet. Register and play!', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
-    } else {
-        // Header
-        ctx.fillStyle = '#ffff00';
-        ctx.font = 'bold 14px Courier New';
-        ctx.textAlign = 'left';
-        ctx.fillText('RANK', 50, 80);
-        ctx.fillText('PLAYER', 100, 80);
-        ctx.fillText('SCORE', 280, 80);
-        ctx.fillText('TIME', 420, 80);
-        
-        // Separator
-        ctx.strokeStyle = '#00ff41';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(40, 100);
-        ctx.lineTo(CANVAS_WIDTH - 40, 100);
-        ctx.stroke();
-        
-        // Scores (show top 10)
-        ctx.fillStyle = '#00ff41';
-        ctx.font = '12px Courier New';
-        ctx.textAlign = 'left';
-        
-        for (let i = 0; i < Math.min(10, leaderboard.length); i++) {
-            const entry = leaderboard[i];
-            const y = 120 + i * 25;
-            
-            // Highlight current player
-            if (gameState.username === entry.username) {
-                ctx.fillStyle = '#ffff00';
-            } else {
-                ctx.fillStyle = '#00ff41';
-            }
-            
-            const rank = i + 1;
-            ctx.fillText(`${rank}`, 50, y);
-            ctx.fillText(entry.username.substr(0, 15), 100, y);
-            ctx.fillText(entry.score, 280, y);
-            ctx.fillText(`${entry.timeSurvived}s`, 420, y);
-        }
-    }
-    
-    // Exit instruction
-    ctx.fillStyle = '#00ff41';
-    ctx.font = '12px Courier New';
-    ctx.textAlign = 'center';
-    ctx.fillText('Press ESC or L to return to menu', CANVAS_WIDTH / 2, CANVAS_HEIGHT - 20);
 }
 
 function drawMenuScreen() {
@@ -655,18 +503,7 @@ function drawMenuScreen() {
     // Display high score
     ctx.fillStyle = '#ff9900';
     ctx.font = '18px Courier New';
-    ctx.fillText(`HIGH SCORE: ${gameState.highScore}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 155);
-    
-    // Current username
-    ctx.fillStyle = '#00ffff';
-    ctx.font = '14px Courier New';
-    ctx.fillText(`User: ${gameState.username || 'Guest'}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 185);
-    
-    // Bottom buttons
-    ctx.fillStyle = '#00ff41';
-    ctx.font = '12px Courier New';
-    ctx.fillText('Press R to Register', CANVAS_WIDTH / 2, CANVAS_HEIGHT - 40);
-    ctx.fillText('Press L for Leaderboard', CANVAS_WIDTH / 2, CANVAS_HEIGHT - 25);
+    ctx.fillText(`HIGH SCORE: ${Math.floor(gameState.highScore)}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 170);
 }
 
 // ============ GAME LOOP ============
@@ -685,10 +522,6 @@ function gameLoop() {
     
     if (gameState.state === 'MENU') {
         drawMenuScreen();
-    } else if (gameState.state === 'REGISTER') {
-        drawRegistrationScreen();
-    } else if (gameState.state === 'LEADERBOARD') {
-        drawLeaderboardScreen();
     } else if (gameState.state === 'GAME_OVER') {
         drawParticles();
         drawPlayer();
@@ -754,3 +587,54 @@ function gameLoop() {
 // Start the game
 init();
 requestAnimationFrame(gameLoop);
+
+// ============ Registration & Leaderboard UI ============
+function hideInfoPanel() {
+    const panel = document.getElementById('playerInfo');
+    if (panel) panel.style.display = 'none';
+}
+
+function showInfoPanel() {
+    const panel = document.getElementById('playerInfo');
+    if (panel) panel.style.display = 'flex';
+}
+
+function openRegisterModal() {
+    document.getElementById('registerModal').classList.remove('hidden');
+    const input = document.getElementById('usernameInput');
+    input.value = gameState.currentPlayerName || '';
+    input.focus();
+}
+
+function closeRegisterModal() {
+    document.getElementById('registerModal').classList.add('hidden');
+}
+
+function submitUsername() {
+    const raw = document.getElementById('usernameInput').value.trim();
+    if (!raw) return;
+    const name = raw.substring(0, 16);
+    gameState.currentPlayerName = name;
+    localStorage.setItem('canvas_apocalypse_username', name);
+    document.getElementById('playerNameDisplay').textContent = name;
+    closeRegisterModal();
+}
+
+function escapeHtml(str) {
+    return str.replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+}
+
+// Hook UI buttons
+document.addEventListener('DOMContentLoaded', () => {
+    const changeBtn = document.getElementById('changeNameBtn');
+    const saveBtn = document.getElementById('saveNameBtn');
+    const closeReg = document.getElementById('closeRegisterBtn');
+
+    if (changeBtn) changeBtn.addEventListener('click', openRegisterModal);
+    if (saveBtn) saveBtn.addEventListener('click', submitUsername);
+    if (closeReg) closeReg.addEventListener('click', closeRegisterModal);
+
+    // Allow Enter key in modal
+    const usernameInput = document.getElementById('usernameInput');
+    if (usernameInput) usernameInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') submitUsername(); });
+});

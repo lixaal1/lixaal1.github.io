@@ -41,3 +41,66 @@ canvas {
     z-index: 10;
     text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
 }
+
+/* Player info buttons */
+#playerInfo {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+#playerInfo button {
+    background: rgba(0,0,0,0.4);
+    color: #00ff41;
+    border: 1px solid rgba(0,255,65,0.2);
+    padding: 4px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#playerInfo button:hover {
+    background: rgba(0,0,0,0.6);
+    border: 1px solid rgba(0,255,65,0.6);
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+}
+
+/* Modal styles */
+.modal {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.4);
+    z-index: 1000;
+}
+
+.modal.hidden { display: none; }
+
+.modal-content {
+    background: #0b1b26;
+    color: #00ff41;
+    padding: 16px;
+    border-radius: 6px;
+    box-shadow: 0 6px 30px rgba(0,0,0,0.7);
+    min-width: 260px;
+    text-align: center;
+}
+
+.modal-content.wide { min-width: 420px; }
+
+.modal-content input {
+    width: 100%;
+    padding: 8px;
+    margin: 8px 0;
+    border-radius: 4px;
+    border: 1px solid rgba(0,255,65,0.12);
+    background: #071018;
+    color: #bfffc1;
+}
+
+.modal-actions { display:flex; gap:8px; justify-content:center; margin-top:8px }

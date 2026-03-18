@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loogikavigade Viktoriin</title>
+    <style>
+        :root {
+            --bg: #f0f2f5;
+            --card: #ffffff;
+            --primary: #4f46e5;
+            --success: #22c55e;
+            --error: #ef4444;
+            --text: #1f2937;
+            --text-light: #6b7280;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .quiz-container {
+            width: 100%;
+            max-width: 500px;
+            perspective: 1000px;
+        }
+
+        .card {
+            background: var(--card);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transition: all 0.4s ease;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        #progress {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        h2 { margin-top: 0; font-size: 1.25rem; line-height: 1.5; }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 1.5rem 0;
+        }
+
+        .option-btn {
+            padding: 12px 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            background: none;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--primary);
+            background: #f5f3ff;
+        }
+
+        .option-btn.correct {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        .option-btn.wrong {
+            background: var(--error);
+            color: white;
+            border-color: var(--error);
+        }
+
+        .explanation {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #f9fafb;
+            border-left: 4px solid var(--primary);
+            display: none;
+            font-size: 0.9rem;
+            animation: fadeIn 0.5s ease;
+        }
+
+        #next-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: none;
+            margin-top: 1rem;
+        }
+
+        .score-screen { text-align: center; display: none; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div class="card" id="quiz-card">
+        <!-- start screen with rules and difficulty selection -->
+        <div id="start-view">
+            <h2>Reeglid</h2>
+            <p>Võta aluseks loogikavigade äratundmine. Iga küsimusel on üks õige vastus.</p>
+            <p>Klõpsa "Vihje" nuppu, et saada väikene suunis enne vastamist.</p>
+            <p>Vali raskusaste – iga raskusaste sisaldab 10 küsimust.</p>
+            <div class="options" id="difficulty-container">
+                <button class="option-btn" onclick="startQuiz('Easy')">Lihtne</button>
+                <button class="option-btn" onclick="startQuiz('Medium')">Keskmine</button>
+                <button class="option-btn" onclick="startQuiz('Hard')">Raske</button>
+                <button class="option-btn" onclick="startQuiz('Very Hard')">Väga raske</button>
+                <button class="option-btn" onclick="startQuiz('Expert')">Ekspert</button>
+            </div>
+        </div>
+
+        <div id="game-view" style="display:none;">
+            <div class="progress-bar"><div id="progress"></div></div>
+            <h2 id="question">Laadin küsimust...</h2>
+            <div class="options" id="options-container"></div>
+            <div id="hint-container">
+                <button id="hint-btn" class="option-btn" style="width:auto; padding:6px 12px; font-size:0.85rem;">Näita vihjet</button>
+                <div id="hint-text" style="margin-top:0.5rem; color: var(--text-light); display:none; font-size:0.85rem;"></div>
+            </div>
+            <div class="explanation" id="explanation"></div>
+            <button id="next-btn">Järgmine küsimus</button>
+        </div>
+
+        <div class="score-screen" id="score-view" style="display:none;">
+            <h1>Viktoriin läbi!</h1>
+            <p>Sinu tulemus: <strong id="final-score">0</strong> / <span id="total-q">0</span></p>
+            <button class="option-btn" style="width:100%; text-align:center" onclick="location.reload()">Proovi uuesti</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const allQuestions = [
+        // Easy (10)
+        { q: "Kuna sa oled nii noor, ei tea sa poliitikast midagi. Sinu arvamus ei loe.", options: ["Õlgmees","Rünnak isiku vastu","Valejuhtum","Libe tee"], correct: 1, info: "See on Ad Hominem: rünnatakse rääkijat, mitte tema argumenti.", hint: "Mõtle, kas räägitakse argumendist või inimesest.", difficulty: 'Easy' },
+        { q: "Kui me lubame täna õpilastel nätsu närida, hakkavad nad varsti koolis suitsetama.", options: ["Punane heeringas","Libe tee","Ringtõestus","Autoriteedile rõhumine"], correct: 1, info: "Libe tee eeldab katastroofilist ahelaid ilma põhjust." , hint: "Vaata, kas sammud on realistlikud.", difficulty: 'Easy' },
+        { q: "Ajakirjanik küsib maksu tõstmise kohta ja vastus räägib hoopis õnnelikest peredest.", options: ["Punane heeringas","Õlgmees","Vaikuse argument","Strawman"], correct: 0, info: "Punane heeringas eirab küsimust.", hint: "Kas vastus on teemaga seotud?", difficulty: 'Easy' },
+        { q: "Kõik mu sõbrad ostsid selle telefoni, siis see peab olema parim.", options: ["Kiirustades tehtud üldistus","Autoriteedile rõhumine","Ringtõestus","Vale dilemma"], correct: 2, info: "Ringtõestus toetub enamuse arvamusele.", hint: "Kas tõestus on tõesuse põhjus?", difficulty: 'Easy' },
+        { q: "Sa kas seda vihkad või oled selle suure fänn – vahepealset ei ole.", options: ["Vale dilemma","Õlgmees","Libe tee","Ad Hominem"], correct: 0, info: "Vale dilemma kitsendab valikuid valesti.", hint: "Kas on üle kahe varianti?", difficulty: 'Easy' },
+        { q: "Kui president väidab, siis see peab olema tõsi.", options: ["Autoriteedile rõhumine","Punane heeringas","Strawman","Ringtõestus"], correct: 0, info: "Autoriteedile rõhumine tugineb positsioonile, mitte argumendile.", hint: "Kas piisab positsioonist tõestamiseks?", difficulty: 'Easy' },
+        { q: "Mina ei ole rassist, kuigi ma narritan teistsuguseid inimesi.", options: ["Ad Hominem","Vale dilemma","Strawman","Punane heeringas"], correct: 3, info: "Punane heeringas segab tähelepanu.", hint: "Kas tunnistus on tegeliku küsimuse asemel?", difficulty: 'Easy' },
+        { q: "Ta ei saa seda matemaatikat teha, sest ta on matemaatikaõpetaja.", options: ["Ad Hominem","Libe tee","Autoriteedile rõhumine","Strawman"], correct: 2, info: "Autoriteet ei anna automaatselt õigsust.", hint: "Vaata, kas on tõestus või lihtsalt staatuse mainimine.", difficulty: 'Easy' },
+        { q: "Kõik 20 eelarvefoorumil olid sellega nõus, siis on see õige.", options: ["Ringtõestus","Punane heeringas","Vale dilemma","Ad Hominem"], correct: 0, info: "Ringtõestus tugineb populatsioonile, mitte argumentidele.", hint: "Kas arvamus võrdub faktiga?", difficulty: 'Easy' },
+        { q: "Kui me kohe ei muuda reegleid, siis varsti laguneb kogu süsteem.", options: ["Libe tee","Strawman","Autoriteedile rõhumine","Kiirustades tehtud üldistus"], correct: 0, info: "Libe tee loob põhjendamatu dominoefekti.", hint: "Kas sammud on tingimusteta?", difficulty: 'Easy' },
+        // Medium (10)
+        { q: "Väidate, et uus poliitika aitab, kuid te ei selgita, kuidas.", options: ["Punane heeringas","Vaikuse argument","Strawman","Ringtõestus"], correct: 1, info: "Vaikuse argument eirab küsimuse.", hint: "Kas on antud vastus või vaikimine?", difficulty: 'Medium' },
+        { q: "Ta ütles, et ilma täheta ülikoolis ei saa sa õnnelik olla, seega peab see tõsi olema.", options: ["Libe tee","Autoriteedile rõhumine","Ad Hominem","Ringtõestus"], correct: 1, info: "Autoriteet ei tähenda fakti.", hint: "Kas põhjendus on teaduslik?", difficulty: 'Medium' },
+        { q: "Kui sa ei poolda seda, oled sa meie vastu.", options: ["Vale dilemma","Ad Hominem","Strawman","Kiirustades tehtud üldistus"], correct: 0, info: "Vale dilemma esitab kaks äärmust.", hint: "Kas on kolmas variant?", difficulty: 'Medium' },
+        { q: "Ainult rumalad inimesed ei pea mind rumalaks.", options: ["Ad Hominem","Punane heeringas","Ringtõestus","Vale dilemma"], correct: 0, info: "Ad Hominem ründab isikut.", hint: "Kas isik on rünnatud?", difficulty: 'Medium' },
+        { q: "Kõik, kes toetavad seda plaani, on tegelikult salajased agentuurid.", options: ["Ad Hominem","Strawman","Punane heeringas","Vaikuse argument"], correct: 0, info: "Ad Hominem loob konstrueeritud süüdistuse.", hint: "Kas väide on isiklik?", difficulty: 'Medium' },
+        { q: "Kui me hakkame elektrit säästma, siis varsti elame pimeduses.", options: ["Libe tee","Ringtõestus","Autoriteedile rõhumine","Kiirustades tehtud üldistus"], correct: 0, info: "Libe tee kujutab katastroofi.", hint: "Kas põhjus on radikaalne?", difficulty: 'Medium' },
+        { q: "Ma ei saa ju valetada – mu sõber on minu tunnistaja.", options: ["Autoriteedile rõhumine","Punane heeringas","Ad Hominem","Strawman"], correct: 0, info: "Autoriteet ei välista kallutust.", hint: "Kas allikas on sõltumatu?", difficulty: 'Medium' },
+        { q: "Sa oled minu vastane, sest sa ei nõustu minuga.", options: ["Ad Hominem","Vale dilemma","Ringtõestus","Libe tee"], correct: 0, info: "Ad Hominem muudab debati isiklikuks.", hint: "On see sõnavahetus debati sisust?", difficulty: 'Medium' },
+        { q: "Kui me ütleme, et rohelised autod on kiirem, siis kõik usuvad.", options: ["Ringtõestus","Strawman","Punane heeringas","Autoriteedile rõhumine"], correct: 0, info: "Ringtõestus usub huulte liikumisele.", hint: "Kas statistika toetab?", difficulty: 'Medium' },
+        { q: "Ainult rumalad inimesed ei tea, et klõpsamine kahjustab.", options: ["Ringtõestus","Ad Hominem","Punane heeringas","Strawman"], correct: 0, info: "Ringtõestus diskrimineerib.", hint: "Kas kõne püüab häbistada?", difficulty: 'Medium' },
+        // Hard (10)
+        { q: "Seletate lahendust kodutusele, aga räägite hoopis majanduskasvust.", options: ["Punane heeringas","Vaikuse argument","Libe tee","Autoriteedile rõhumine"], correct: 0, info: "Punane heeringas kõrvaldaja tähelepanu.", hint: "Kas teema põhi on kadunud?", difficulty: 'Hard' },
+        { q: "Kui me täna lõpetame suitsetamise, siis õhk muutub mürgiseks.", options: ["Libe tee","Ringtõestus","Vale dilemma","Strawman"], correct: 0, info: "Libe tee ehitab tobedaid kettaid.", hint: "Kas põhjus on seotud?", difficulty: 'Hard' },
+        { q: "Õpetaja küsib põhjendust ja vastad hoopis oma lapsepõlve haavadest.", options: ["Punane heeringas","Ad Hominem","Strawman","Vaikuse argument"], correct: 0, info: "Punane heeringas eirab teemat.", hint: "Kas jutt liigub kõrvale?", difficulty: 'Hard' },
+        { q: "Kui lubame täna pliit töötada, siis homme plahvatab maailm.", options: ["Libe tee","Vale dilemma","Ringtõestus","Ad Hominem"], correct: 0, info: "Libe tee loob irratsionaalse ahela.", hint: "Kas sammud on liialdatud?", difficulty: 'Hard' },
+        { q: "Miks sa ei usu mind? Sa oled lihtsalt ropendaja.", options: ["Ad Hominem","Strawman","Punane heeringas","Autoriteedile rõhumine"], correct: 0, info: "Ad Hominem ründab isikut ideest.", hint: "Kas väide puudutab teemat?", difficulty: 'Hard' },
+        { q: "Kui sa ei toeta uut seadust, siis oled sa seadusevastane.", options: ["Vale dilemma","Libe tee","Punane heeringas","Ringtõestus"], correct: 0, info: "Vale dilemma sulgeb alternatiivid.", hint: "Kas on kolmas tee?", difficulty: 'Hard' },
+        { q: "See peab olema tõsi, sest ma ütlesin nii.", options: ["Autoriteedile rõhumine","Vaikuse argument","Ad Hominem","Strawman"], correct: 0, info: "Autoriteedile rõhumine tugineb autoriteedile, mitte faktile.", hint: "Kas fakt on tõestatud?", difficulty: 'Hard' },
+        { q: "Kui sa nurised, siis sa vihkad Eestit.", options: ["Ad Hominem","Punane heeringas","Libe tee","Vale dilemma"], correct: 0, info: "Ad Hominem seob kriitika isikuga.", hint: "Kas tegemist on rahvuskaasluse mustamisega?", difficulty: 'Hard' },
+        { q: "Kõik, kes on skeptikud, arvavad, et see on võlts.", options: ["Ringtõestus","Kannatlikkus argumentatsioon","Punane heeringas","Vaikuse argument"], correct: 0, info: "Ringtõestus tugineb grupi arvamusele.", hint: "Kas grupp on asjakohane?", difficulty: 'Hard' },
+        { q: "Ma ei räägi teemat, sest see on liiga keeruline.", options: ["Vaikuse argument","Libe tee","Ad Hominem","Strawman"], correct: 0, info: "Vaikuse argument väldib selgitust.", hint: "Kas põhjus on äraütlev?", difficulty: 'Hard' },
+        { q: "See väide ei saa olla vale, sest keegi kunagi ei filminud ümberlükkamist.", options: ["Vale dilemma","Punane heeringas","Strawman","Autoriteedile rõhumine"], correct: 1, info: "Punane heeringas viib teema kõrvale disprovingist.", hint: "Kas argumendil on vastuväide?", difficulty: 'Hard' },
+        // Very Hard (10)
+        { q: "Te ütleksite, et see pole tõsi, sest mul on seda juba varem öeldud.", options: ["Ringtõestus","Ad Hominem","Autoriteedile rõhumine","Punane heeringas"], correct: 0, info: "Ringtõestus kasutab ringilt jõudmist sama väite juurde.", hint: "Kas tõestused loovad ringi?", difficulty: 'Very Hard' },
+        { q: "Kui oled hea sõber, siis sa ei küsi küsimusi.", options: ["Vale dilemma","Ad Hominem","Libe tee","Strawman"], correct: 0, info: "Vale dilemma seob valikuid ebaolulisel moel.", hint: "Kas sõprussessioon on tingimus?", difficulty: 'Very Hard' },
+        { q: "See väide ei saa olla vale, sest keegi kunagi ei filminud selle ümberlükkamist.", options: ["Vale dilemma","Punane heeringas","Strawman","Autoriteedile rõhumine"], correct: 1, info: "Punane heeringas viib teema kõrvale disprovingist.", hint: "Kas argumendil on vastuväide?", difficulty: 'Very Hard' },
+        { q: "Kui sa ei toeta meie juhte, siis sa toetamata lähed sellest grupist välja.", options: ["Vale dilemma","Libe tee","Ad Hominem","Ringtõestus"], correct: 0, info: "Vale dilemma ähvardab valikutega.", hint: "Kas ähvardus on põhjendatud?", difficulty: 'Very Hard' },
+        { q: "Mõni üksik juhtum tõestab, et kogu süsteem on vale.", options: ["Kiirustades tehtud üldistus","Strawman","Punane heeringas","Autoriteedile rõhumine"], correct: 0, info: "Kiirustades tehtud üldistus teeb laia järelduse väheste andmete põhjal.", hint: "Kas piisab kombinatsioonist?", difficulty: 'Very Hard' },
+        { q: "Arvamusturu uuring näitab, et kõik on õige, seega ei saa see olla vale.", options: ["Ringtõestus","Punane heeringas","Libe tee","Vaikuse argument"], correct: 0, info: "Ringtõestus toetub populaarsele veendumusele.", hint: "Kas uuring on objektiivne?", difficulty: 'Very Hard' },
+        { q: "Sa ei võitnud argumenti, sest sa ei rääkinud piisavalt valjult.", options: ["Ad Hominem","Punane heeringas","Libe tee","Vale dilemma"], correct: 0, info: "Ad Hominem väidab, et kellegi esitamine mõjutab tõde.", hint: "Kas häälekus on fakt?", difficulty: 'Very Hard' },
+        { q: "Kui sa kaalud mõlemat poolt liiga kaua, siis oled sa otsustamatuse oht.", options: ["Libe tee","Ringtõestus","Autoriteedile rõhumine","Strawman"], correct: 0, info: "Libe tee kasutab hirmu aegluse ees.", hint: "Kas aeg on tegelik argument?", difficulty: 'Very Hard' },
+        { q: "Kui see avaldus on valesti kirjutatud, siis see peab olema vale.", options: ["Strawman","Punane heeringas","Ad Hominem","Vaikuse argument"], correct: 0, info: "Strawman moonutab argumendi vormi, mitte sisu.", hint: "Kas sisu on muudetud?", difficulty: 'Very Hard' },
+        { q: "Sinule ütles XYZ, et see on tõsi, seega see on tõsi.", options: ["Ad Hominem","Autoriteedile rõhumine","Ringtõestus","Punane heeringas"], correct: 1, info: "Autoriteedile rõhumine tugineb autoriteedile, mitte tõendile.", hint: "Kas autoriteet on asjakohane?", difficulty: 'Very Hard' },
+        // Expert (10)
+        { q: "See teooria on tõeline, sest ma eelistan seda.", options: ["Ad Hominem","Ringtõestus","Libe tee","Kiirustades tehtud üldistus"], correct: 1, info: "Ringtõestus toetub isiklikule eelistusele.", hint: "Kas valik on emotsionaalne?", difficulty: 'Expert' },
+        { q: "Kui me ei hinda kultuuri, siis kaotame identiteedi.", options: ["Libe tee","Vale dilemma","Punane heeringas","Ad Hominem"], correct: 0, info: "Libe tee ohustab hirmuga.", hint: "Kas ühendus on loogiline?", difficulty: 'Expert' },
+        { q: "See peab olema õige, sest kõrgema kraadi omanik ütles nii.", options: ["Autoriteedile rõhumine","Punane heeringas","Strawman","Vaikuse argument"], correct: 0, info: "Autoriteet ei garanteeri tõde.", hint: "Kas kvalifikatsioon on asjakohane?", difficulty: 'Expert' },
+        { q: "Kui me ei kiirusta, siis me kukume maha.", options: ["Libe tee","Ringtõestus","Ad Hominem","Vale dilemma"], correct: 0, info: "Libe tee kasutab hirmu langusega.", hint: "Kas aegluse halb mõju on põhjuslik?", difficulty: 'Expert' },
+        { q: "Mõni ekspert on seda kinnitanud, seega peab see olema tõsi.", options: ["Autoriteedile rõhumine","Ringtõestus","Punane heeringas","Strawman"], correct: 0, info: "Autoriteet ei pruugi olla usaldusväärne.", hint: "Kas ekspert on neutraalne?", difficulty: 'Expert' },
+        { q: "Kui sa ei poolda meie valitsust, oled sa traagiline julgeolekuohus.", options: ["Ad Hominem","Vale dilemma","Punane heeringas","Strawman"], correct: 0, info: "Ad Hominem mängib ohuga.", hint: "Kas ähvardus on fakt?", difficulty: 'Expert' },
+        { q: "See väide on tõsi, sest ma nägin seda unenäos.", options: ["Punane heeringas","Ad Hominem","Vaikuse argument","Ringtõestus"], correct: 0, info: "Punane heeringas viitab isiklikule kogemusele.", hint: "Kas unenägu on tõend?", difficulty: 'Expert' },
+        { q: "Kui sa ei nõustu, siis sa ei ole mõtlev inimene.", options: ["Ad Hominem","Ringtõestus","Strawman","Autoriteedile rõhumine"], correct: 0, info: "Ad Hominem solvab.", hint: "Kas solvamine on argument?", difficulty: 'Expert' },
+        { q: "See väide on vale, sest see tuli vale allikast.", options: ["Punane heeringas","Autoriteedile rõhumine","Libe tee","Kiirustades tehtud üldistus"], correct: 0, info: "Punane heeringas kasutab allikat kui lohutust.", hint: "Kas allikas muutis sisu?", difficulty: 'Expert' },
+        { q: "Kui me ei vali seda, siis oleme kõik hukule määratud.", options: ["Libe tee","Vale dilemma","Ad Hominem","Ringtõestus"], correct: 0, info: "Libe tee sõltub katastroofist.", hint: "Kas ähvardus on tõend?", difficulty: 'Expert' }
+    ];
+
+    // dynamic subset chosen by difficulty
+    let questions = [];
+
+    let currentQ = 0;
+
+    let score = 0;
+    let answered = false;
+
+    const hintBtn = document.getElementById('hint-btn');
+    const hintText = document.getElementById('hint-text');
+
+    function startQuiz(difficulty) {
+        questions = allQuestions.filter(q => q.difficulty === difficulty);
+        currentQ = 0;
+        score = 0;
+        document.getElementById('start-view').style.display = 'none';
+        document.getElementById('game-view').style.display = 'block';
+        loadQuestion();
+    }
+
+    const qEl = document.getElementById('question');
+    const optionsContainer = document.getElementById('options-container');
+    const nextBtn = document.getElementById('next-btn');
+    const explanationEl = document.getElementById('explanation');
+    const progressEl = document.getElementById('progress');
+
+    function loadQuestion() {
+        answered = false;
+        const data = questions[currentQ];
+        qEl.innerText = data.q;
+        optionsContainer.innerHTML = '';
+        explanationEl.style.display = 'none';
+        nextBtn.style.display = 'none';
+        
+        progressEl.style.width = `${(currentQ / questions.length) * 100}%`;
+
+        data.options.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(i);
+            optionsContainer.appendChild(btn);
+        });
+
+        // prepare hint
+        hintText.innerText = data.hint || '';
+        hintText.style.display = 'none';
+        hintBtn.style.display = 'inline-block';
+        hintBtn.innerText = 'Näita vihjet';
+        hintBtn.onclick = () => {
+            if (hintText.style.display === 'none') {
+                hintText.style.display = 'block';
+                hintBtn.innerText = 'Peida vihjet';
+            } else {
+                hintText.style.display = 'none';
+                hintBtn.innerText = 'Näita vihjet';
+            }
+        };
+    }
+
+    function checkAnswer(idx) {
+        if (answered) return;
+        answered = true;
+        
+        const data = questions[currentQ];
+        const buttons = optionsContainer.getElementsByClassName('option-btn');
+
+        if (idx === data.correct) {
+            buttons[idx].classList.add('correct');
+            score++;
+        } else {
+            buttons[idx].classList.add('wrong');
+            buttons[data.correct].classList.add('correct');
+        }
+
+        explanationEl.innerText = data.info;
+        explanationEl.style.display = 'block';
+        nextBtn.style.display = 'block';
+        
+        Array.from(buttons).forEach(b => b.disabled = true);
+    }
+
+    nextBtn.onclick = () => {
+        currentQ++;
+        if (currentQ < questions.length) {
+            loadQuestion();
+        } else {
+            showResults();
+        }
+    };
+
+    function showResults() {
+        document.getElementById('game-view').style.display = 'none';
+        document.getElementById('score-view').style.display = 'block';
+        document.getElementById('final-score').innerText = score;
+        document.getElementById('total-q').innerText = questions.length;
+    }
+</script>
+
+</body>
+</html>

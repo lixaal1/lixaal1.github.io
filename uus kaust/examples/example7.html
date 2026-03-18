@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paroolianalüsaator</title>
+    <style>
+        :root {
+            --bg: #121212;
+            --card-bg: #1e1e1e;
+            --text: #e0e0e0;
+            --weak: #ff4d4d;
+            --fair: #ffa500;
+            --good: #2ecc71;
+            --strong: #1abc9c;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h2 { margin-bottom: 1.5rem; font-weight: 300; text-align: center; }
+
+        .input-group { position: relative; margin-bottom: 1rem; }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            background: #2a2a2a;
+            border: 2px solid #333;
+            border-radius: 6px;
+            color: white;
+            font-size: 1rem;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input:focus { border-color: var(--strong); }
+
+        .strength-bar {
+            height: 8px;
+            background: #333;
+            border-radius: 4px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        .strength-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 0.4s ease, background-color 0.4s ease;
+        }
+
+        .criteria {
+            list-style: none;
+            padding: 0;
+            font-size: 0.85rem;
+        }
+
+        .criteria li {
+            margin-bottom: 5px;
+            color: #777;
+            transition: color 0.3s;
+        }
+
+        .criteria li.valid { color: var(--good); }
+        .criteria li.valid::before { content: '✓ '; }
+        .criteria li.invalid::before { content: '× '; }
+
+        /* style for eye button potential */
+        #togglePwd:hover { color: var(--strong); }
+
+        /* floating fact panels */
+        .fact-panel {
+            position: fixed;
+            top: 20%;
+            width: 180px;
+            font-size: 0.8rem;
+            color: #aaa;
+            background: rgba(0,0,0,0.4);
+            padding: 0.5rem;
+            border-radius: 6px;
+            line-height: 1.4;
+            animation: float 6s ease-in-out infinite;
+        }
+        .fact-panel.left { left: 10px; animation-delay: 0s; }
+        .fact-panel.right { right: 10px; animation-delay: 3s; }
+
+        @keyframes float {
+            0%,100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .status-text {
+            text-align: right;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-top: -5px;
+            height: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="fact-panel left" style="top:10%;">
+    • "123456" is the world’s most common password.
+    <br>• Use 12+ characters with varied types.
+</div>
+<div class="fact-panel left" style="top:25%;">
+    • Humans reuse passwords 59% of the time.
+    <br>• "password" was the second most popular.
+</div>
+<div class="fact-panel left" style="top:40%;">
+    • Dictionary attacks try 10 billion words/sec.
+    <br>• People type passwords 8x per day on average.
+</div>
+<div class="fact-panel left" style="top:60%;">
+    • 81% of data breaches use weak or stolen credentials.
+    <br>• 23% of users write passwords on sticky notes.
+</div>
+<div class="fact-panel left" style="top:75%;">
+    • Long passphrases are easier to remember than complex strings.
+    <br>• Password managers generate and store secure passwords.
+</div>
+<div class="fact-panel right" style="top:10%;">
+    • An 8‑char lowercase password can be cracked instantly.
+    <br>• Adding a single symbol multiplies strength.
+</div>
+<div class="fact-panel right" style="top:25%;">
+    • Length matters more than complexity.
+    <br>• 45% of people never change weak passwords.
+</div>
+<div class="fact-panel right" style="top:40%;">
+    • Passphrases (4+ words) give high entropy.
+    <br>• 60% of users reuse passwords across sites.
+</div>
+<div class="fact-panel right" style="top:60%;">
+    • Two-factor authentication blocks 99% of automated attacks.
+    <br>• 12 characters of random entropy ≈ 70 bits.
+</div>
+<div class="fact-panel right" style="top:75%;">
+    • Hackers can buy stolen credentials for cents on the dark web.
+    <br>• Using unique passwords stops one breach from becoming many.
+</div>
+
+<div class="container">
+    <h2>Paroolianalüsaator</h2>
+    
+    <div class="input-group">
+        <input type="password" id="password" placeholder="Sisesta parool...">
+        <button id="togglePwd" title="Näita parooli" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; color:var(--text); font-size:1.2rem;">👁️</button>
+    </div>
+    <div class="status-text" id="status-text"></div>
+    <div class="strength-bar">
+        <div class="strength-fill" id="strength-fill"></div>
+    </div>
+    <ul class="criteria">
+        <li id="length">Vähemalt 8 märki</li>
+        <li id="case">Suur- ja väiketähed</li>
+        <li id="number">Vähemalt üks number</li>
+        <li id="symbol">Vähemalt üks sümbol (!@#$%^&*)</li>
+    </ul>
+</div>
+
+<script>
+    const passwordInput = document.getElementById('password');
+    const strengthFill = document.getElementById('strength-fill');
+    const statusText = document.getElementById('status-text');
+    
+    const criteria = {
+        length: document.getElementById('length'),
+        case: document.getElementById('case'),
+        number: document.getElementById('number'),
+        symbol: document.getElementById('symbol')
+    };
+
+    // toggle visibility
+    const toggleBtn = document.getElementById('togglePwd');
+    toggleBtn.addEventListener('click', () => {
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggleBtn.title = 'Peida parool';
+        } else {
+            passwordInput.type = 'password';
+            toggleBtn.title = 'Näita parooli';
+        }
+    });
+
+
+    passwordInput.addEventListener('input', () => {
+        const val = passwordInput.value;
+        let score = 0;
+
+        // Kontrollid
+        const checks = {
+            length: val.length >= 8,
+            case: /[a-z]/.test(val) && /[A-Z]/.test(val),
+            number: /\d/.test(val),
+            symbol: /[^A-Za-z0-9]/.test(val)
+        };
+
+        // Uuenda visuaali
+        Object.keys(checks).forEach(key => {
+            if (checks[key]) {
+                criteria[key].classList.add('valid');
+                criteria[key].classList.remove('invalid');
+                score++;
+            } else {
+                criteria[key].classList.remove('valid');
+                if (val.length > 0) criteria[key].classList.add('invalid');
+            }
+        });
+
+        // Tugevuse skaala
+        let width = '0%';
+        let color = 'transparent';
+        let text = '';
+
+        if (val.length > 0) {
+            switch(score) {
+                case 0:
+                case 1: width = '25%'; color = 'var(--weak)'; text = 'Nõrk'; break;
+                case 2: width = '50%'; color = 'var(--fair)'; text = 'Keskmine'; break;
+                case 3: width = '75%'; color = 'var(--good)'; text = 'Hea'; break;
+                case 4: width = '100%'; color = 'var(--strong)'; text = 'Väga tugev'; break;
+            }
+        }
+
+        strengthFill.style.width = width;
+        strengthFill.style.background = color;
+        statusText.innerText = text;
+        statusText.style.color = color;
+
+        // estimate crack time (simple brute force with 1e11 guesses/sec)
+        const crackEl = document.getElementById('crack-time');
+        if(val.length === 0) {
+            crackEl.innerText = 'Murda aeg: -';
+        } else {
+            // assume full ASCII 94 possibilities
+            const combos = Math.pow(94, val.length);
+            const seconds = combos / 1e11;
+            function formatSec(s) {
+                if (s < 60) return s.toFixed(2) + ' s';
+                const m = Math.floor(s/60);
+                if (m < 60) return m + ' min';
+                const h = Math.floor(m/60);
+                if (h < 24) return h + ' h';
+                const d = Math.floor(h/24);
+                if (d < 365) return d + ' d';
+                const y = (d/365).toFixed(1);
+                return y + ' a';
+            }
+            crackEl.innerText = 'Murda aeg: ' + formatSec(seconds);
+        }
+    });
+</script>
+
+</body>
+</html>

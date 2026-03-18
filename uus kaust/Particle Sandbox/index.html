@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="et">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Particle Sandbox</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="layout">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Digitaalse elu simulaator</p>
+          <h1>Particle Sandbox</h1>
+          <p class="description">
+            Puista liiva, vett ja gaasi ning mõjuta osakesi gravitatsiooni,
+            tõmbe ja tõukega. Kogu simulatsioon töötab samal lehel.
+          </p>
+        </div>
+
+        <div class="control-panel">
+          <label>
+            Materjal
+            <select id="materialSelect">
+              <option value="sand">Liiv</option>
+              <option value="water">Vesi</option>
+              <option value="gas">Gaas</option>
+            </select>
+          </label>
+
+          <label>
+            Pintslireziim
+            <select id="toolSelect">
+              <option value="spray">Puista osakesi</option>
+              <option value="attract">Tomba osakesi</option>
+              <option value="repel">Paiska laiali</option>
+            </select>
+          </label>
+
+          <label>
+            Pintsli suurus
+            <input id="brushSize" type="range" min="2" max="14" value="6" />
+          </label>
+
+          <label>
+            Puistamise tugevus
+            <input id="sprayRate" type="range" min="1" max="12" value="6" />
+          </label>
+
+          <button id="clearButton" type="button">Puhasta vaade</button>
+
+          <label class="inline-label">
+            Heliefektid
+            <label class="toggle">
+              <input type="checkbox" id="soundToggle" checked />
+              <span class="toggle-slider"></span>
+            </label>
+          </label>
+
+          <label>
+            Rivistussõna
+            <div class="organize-row">
+              <input type="text" id="organizeWord" value="LIFE" maxlength="10" placeholder="Kirjuta sõna…" />
+              <button id="organizeButton" type="button">Rivista</button>
+            </div>
+          </label>
+
+          <label>
+            Tuule tugevus
+            <div class="wind-row">
+              <span class="wind-label">← Vasak</span>
+              <input id="windStrength" type="range" min="-5" max="5" value="0" step="1" />
+              <span class="wind-label">Parem →</span>
+            </div>
+          </label>
+
+          <label class="inline-label">
+            Elu &amp; Surm (10 s)
+            <label class="toggle">
+              <input type="checkbox" id="lifeToggle" />
+              <span class="toggle-slider"></span>
+            </label>
+          </label>
+
+          <label class="inline-label">
+            Termokamera
+            <label class="toggle">
+              <input type="checkbox" id="heatMapToggle" />
+              <span class="toggle-slider"></span>
+            </label>
+          </label>
+
+          <button id="freezeButton" type="button">⏸ Külmuta aeg</button>
+        </div>
+      </section>
+
+      <section class="simulator-card">
+        <canvas id="sandbox" width="900" height="540" aria-label="Particle sandbox"></canvas>
+        <div class="stats-bar">
+          <span id="statusText">Valmis osakeste puistamiseks</span>
+          <span id="particleCount">Osakesi: 0</span>
+        </div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

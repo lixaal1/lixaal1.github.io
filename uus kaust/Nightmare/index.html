@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digital Nightmare</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero-panel">
+      <div>
+        <p class="eyebrow">Interactive Glitch Processor</p>
+        <h1>Digital Nightmare</h1>
+        <p class="intro">
+          Lae üles foto või ava kaamera. Seejärel lase hiirel, klikkidel ja helil pilt küberpungi-pudruks lõhkuda.
+        </p>
+      </div>
+      <div class="hero-actions">
+        <a class="portfolio-link" href="https://your-portfolio.example" target="_blank" rel="noreferrer">
+          Portfolio pealeht
+        </a>
+        <button id="saveChaosButton" class="accent-button" type="button">Chaos Save</button>
+      </div>
+    </header>
+
+    <main class="layout-grid">
+      <section class="control-panel">
+        <div class="panel-card">
+          <h2>Allikas</h2>
+          <div class="control-group">
+            <label class="file-upload">
+              <span>Lae foto</span>
+              <input id="imageUpload" type="file" accept="image/*">
+            </label>
+            <button id="cameraButton" type="button">Lülita kaamera sisse</button>
+            <button id="micButton" type="button">Lülita mikrofon sisse</button>
+          </div>
+          <p id="statusText" class="status-text">Laadi pilt või ava kaamera.</p>
+        </div>
+
+        <div class="panel-card">
+          <h2>Glitch kontrollerid</h2>
+          <div class="toggle-grid">
+            <label><input id="rgbSplitToggle" type="checkbox" checked> RGB Split</label>
+            <label><input id="datamoshToggle" type="checkbox" checked> Datamoshing Lite</label>
+            <label><input id="pixelSortToggle" type="checkbox" checked> Pixel Sorting</label>
+            <label><input id="audioToggle" type="checkbox" checked> Audio Distortion</label>
+            <label><input id="scanlineToggle" type="checkbox" checked> Scanlines</label>
+            <label><input id="noiseToggle" type="checkbox" checked> VHS Noise</label>
+            <label><input id="mirrorToggle" type="checkbox" checked> Mirror Dimension</label>
+            <label><input id="freezeToggle" type="checkbox"> Frame Freeze</label>
+            <label><input id="asciiToggle" type="checkbox"> ASCII Mode</label>
+          </div>
+          <div class="control-group sliders">
+            <label>
+              Mirror sectors
+              <input id="mirrorSegments" type="range" min="4" max="8" step="4" value="4">
+            </label>
+            <label>
+              Glitch intensity
+              <input id="intensitySlider" type="range" min="0.2" max="1.8" step="0.05" value="1">
+            </label>
+          </div>
+        </div>
+
+        <div class="panel-card">
+          <h2>Kasutus</h2>
+          <ul class="usage-list">
+            <li>Liiguta hiirt: RGB kanalid ja glitch-jitter muutuvad.</li>
+            <li>Kliki canvas’ele: uus freeze-ala lukustub.</li>
+            <li>Räägi mikrofoni: lagunemise intensiivsus kasvab.</li>
+            <li>ASCII mode: renderdab sama kaadri tekstisümbolitena.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="stage-panel">
+        <div class="canvas-frame">
+          <canvas id="outputCanvas" width="1280" height="720"></canvas>
+          <canvas id="asciiCanvas" width="1280" height="720" hidden></canvas>
+          <div class="overlay-hud">
+            <span id="audioMeter">MIC 0%</span>
+            <span id="modeLabel">MODE: NIGHTMARE</span>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <video id="cameraFeed" autoplay muted playsinline hidden></video>
+  <script src="app.js"></script>
+</body>
+</html>

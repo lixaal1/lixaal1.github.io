@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeyralSync - Interactive Audio-Visual Instrument</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>NeyralSync</h1>
+            <p class="subtitle">Helilised Jooned (Sound Lines)</p>
+        </header>
+
+        <div class="controls">
+            <button id="recordBtn" class="btn btn-record" title="Salvesta 5 sekundit">⏺ Record & Loop</button>
+            <button id="clearBtn" class="btn btn-clear" title="Kustuta kuvari (raputus või nupp)">✨ Clear</button>
+            <button id="symmetryToggle" class="btn btn-toggle" title="Peegelda 4 suunda">↔ Symmetry</button>
+            <button id="vibeToggle" class="btn btn-toggle active" title="Taustal kostev heli">🎵 Background Vibe</button>
+            
+            <div class="sliders">
+                <label>
+                    Delay: 
+                    <input type="range" id="delayAmount" min="0" max="1" step="0.1" value="0.5">
+                    <span id="delayValue">50%</span>
+                </label>
+                <label>
+                    Decay: 
+                    <input type="range" id="decayAmount" min="0.5" max="3" step="0.1" value="1.5">
+                    <span id="decayValue">1.5s</span>
+                </label>
+            </div>
+        </div>
+
+        <canvas id="canvas"></canvas>
+
+        <div class="info">
+            <p>💡 <strong>Instrumentation:</strong> 🔴 Punane (Bass) | 🔵 Sinine (Piano) | 🟡 Kollane (Synth)</p>
+            <p>💡 <strong>Y-positsioon:</strong> Kõrgus → Helikõrgus</p>
+            <p>💡 <strong>Kiirus:</strong> Kiirem joon → Valjemaks</p>
+            <p id="recordStatus" class="hidden">Recording... 5s</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/audio-engine.js"></script>
+    <script src="js/gravity-loops.js"></script>
+    <script src="js/symmetry-mode.js"></script>
+    <script src="js/echo-trails.js"></script>
+    <script src="js/waveform-brush.js"></script>
+    <script src="js/shake-detector.js"></script>
+    <script src="js/background-vibe.js"></script>
+    <script src="js/record-loop.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

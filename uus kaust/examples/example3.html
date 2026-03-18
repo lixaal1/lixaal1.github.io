@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sotsiaalmeedia Sõltuvuse Simulaator</title>
+    <style>
+        :root {
+            --bg: #050505;
+            --card-bg: #0f0f0f;
+            --accent: #ff003c;
+            --text: #ffffff;
+            --text-dim: #888;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            padding: 2rem;
+            border: 1px solid #222;
+            background: var(--card-bg);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            margin-bottom: 0.5rem;
+            color: var(--accent);
+        }
+
+        p.subtitle {
+            color: var(--text-dim);
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .input-group {
+            margin-bottom: 3rem;
+        }
+
+        input[type="number"] {
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid var(--accent);
+            color: white;
+            font-size: 3rem;
+            font-weight: 800;
+            width: 120px;
+            text-align: center;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            width: 160px;
+            border-bottom-color: white;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            color: var(--text-dim);
+            font-weight: 600;
+        }
+
+        .results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+
+        .results.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .stat-card {
+            padding: 1.5rem;
+            border: 1px solid #1a1a1a;
+            background: #0a0a0a;
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: var(--text-dim);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+        }
+
+        .highlight { color: var(--accent); }
+
+        .timer-container {
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+            color: var(--text-dim);
+        }
+
+        .timer-container #uptime {
+            font-weight: 700;
+            color: var(--accent);
+            margin-left: 0.5rem;
+        }
+
+        /* Remove arrows from number input */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>KADUNUD AEG</h1>
+    <p class="subtitle">Sotsiaalmeedia Sõltuvuse Analüüs</p>
+
+    <div class="timer-container">
+        <span id="uptimeLabel">Aeg lehel:</span>
+        <span id="uptime">00:00:00</span>
+    </div>
+
+    <div class="input-group">
+        <input type="number" id="dailyHours" placeholder="0" min="0" max="24" step="0.5">
+        <label for="dailyHours">TUNDI PÄEVAS</label>
+    </div>
+
+    <div class="results" id="resultsArea">
+        <div class="stat-card">
+            <span class="stat-value highlight" id="hoursYear">0</span>
+            <span class="stat-label">Tundi aastas</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-value" id="daysYear">0</span>
+            <span class="stat-label">Täispäeva aastas</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-value highlight" id="percentLife">0%</span>
+            <span class="stat-label">Ärkveloleku ajast</span>
+        </div>
+        <!-- additional suggestion cards -->
+        <div class="stat-card">
+            <span class="stat-value" id="booksYear">0</span>
+            <span class="stat-label">Raamatut aastas (8h/raamat)</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-value" id="studyHours">0</span>
+            <span class="stat-label">Tundi õppimiseks aastas</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-value" id="exerciseHours">0</span>
+            <span class="stat-label">Tundi treeninguks aastas</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    const input = document.getElementById('dailyHours');
+    const resultsArea = document.getElementById('resultsArea');
+    
+    const elements = {
+        hoursYear: document.getElementById('hoursYear'),
+        daysYear: document.getElementById('daysYear'),
+        percentLife: document.getElementById('percentLife'),
+        booksYear: document.getElementById('booksYear'),
+        studyHours: document.getElementById('studyHours'),
+        exerciseHours: document.getElementById('exerciseHours')
+    };
+
+    input.addEventListener('input', (e) => {
+        const hours = parseFloat(e.target.value) || 0;
+        
+        if (hours > 0) {
+            resultsArea.classList.add('visible');
+            calculate(hours);
+        } else {
+            resultsArea.classList.remove('visible');
+        }
+    });
+
+    function calculate(daily) {
+        // Logic: 
+        // 1 year = 365 days
+        // Waking life = 16 hours (assuming 8h sleep)
+        
+        const hPerYear = daily * 365;
+        const dPerYear = hPerYear / 24;
+        const percentage = (daily / 16) * 100;
+
+        animateValue(elements.hoursYear, hPerYear, 0);
+        animateValue(elements.daysYear, dPerYear, 1);
+        animateValue(elements.percentLife, percentage, 1, '%');
+
+        // suggestions based on total hours
+        const books = hPerYear / 8; // 8 hours per book
+        const study = hPerYear;     // hours could be spent studying
+        const exercise = hPerYear;  // hours could be spent exercising
+
+        animateValue(elements.booksYear, books, 1);
+        animateValue(elements.studyHours, study, 0);
+        animateValue(elements.exerciseHours, exercise, 0);
+    }
+
+    function animateValue(obj, end, decimals, suffix = '') {
+        let start = parseFloat(obj.innerHTML) || 0;
+        if (suffix) start = parseFloat(obj.innerHTML.replace(suffix, '')) || 0;
+        
+        const duration = 800;
+        let startTimestamp = null;
+
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            const current = progress * (end - start) + start;
+            
+            obj.innerHTML = current.toFixed(decimals) + suffix;
+            
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    // realtime uptime counter
+    (() => {
+        const start = Date.now();
+        const uptimeEl = document.getElementById('uptime');
+
+        function format(ms) {
+            const totalSeconds = Math.floor(ms / 1000);
+            const hrs = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+            const mins = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+            const secs = String(totalSeconds % 60).padStart(2, '0');
+            return `${hrs}:${mins}:${secs}`;
+        }
+
+        function tick() {
+            uptimeEl.textContent = format(Date.now() - start);
+        }
+
+        setInterval(tick, 1000);
+        tick();
+    })();
+</script>
+
+</body>
+</html>
