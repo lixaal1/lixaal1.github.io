@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="et">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Emotsioonide Tuvastaja</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body data-emotion="neutral">
+    <main class="app-shell">
+      <header class="hero">
+        <p class="eyebrow">Reaalajas kaamerarakendus</p>
+        <h1>Emotsioonide Tuvastaja</h1>
+        <p class="lead">
+          Rakendus tuvastab näolt emotsiooni (rõõm, kurbus, neutraalne, viha)
+          ja muudab vastavalt kogu tausta.
+        </p>
+      </header>
+
+      <section class="layout">
+        <article class="camera-card">
+          <div class="video-wrap">
+            <video id="camera" autoplay muted playsinline></video>
+            <canvas id="overlay"></canvas>
+            <img id="figmaEmotion" alt="Emotsiooni ikoon" hidden />
+          </div>
+
+          <div class="status-row">
+            <div>
+              <p class="status-label">Tuvastatud emotsioon</p>
+              <p id="emotionText" class="status-value">Laen mudeleid...</p>
+            </div>
+            <div class="chip" id="modelState">Mudelid: käivituvad</div>
+          </div>
+        </article>
+
+        <aside class="controls-card">
+          <h2>Lisavalikud</h2>
+          <p class="muted">
+            Pärast põhifunktsionaalsust lisatud 5 valikuvõimalust.
+          </p>
+
+          <div class="option-list">
+            <label class="option-item">
+              <input id="optFigma" type="checkbox" checked />
+              <span>1) Figma-stiilis emotsiooni ikoon näo kõrval</span>
+            </label>
+            <label class="option-item">
+              <input id="optConfidence" type="checkbox" checked />
+              <span>2) Emotsiooni kindluse protsendiribad</span>
+            </label>
+            <label class="option-item">
+              <input id="optCapture" type="checkbox" />
+              <span>3) Automaatne kaader emotsiooni muutumisel</span>
+            </label>
+            <label class="option-item">
+              <input id="optSound" type="checkbox" />
+              <span>4) Helisignaal emotsiooni vahetusel</span>
+            </label>
+            <label class="option-item">
+              <input id="optMirror" type="checkbox" checked />
+              <span>5) Peegelpildi reziim (selfie-vaade)</span>
+            </label>
+          </div>
+
+          <div id="confidencePanel" class="confidence-panel"></div>
+        </aside>
+      </section>
+
+      <section class="gallery-card">
+        <div class="gallery-head">
+          <h2>Automaatkaadrid</h2>
+          <button id="clearShots" type="button">Puhasta</button>
+        </div>
+        <div id="shots" class="shots"></div>
+      </section>
+    </main>
+
+    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <script defer src="app.js"></script>
+  </body>
+</html>
