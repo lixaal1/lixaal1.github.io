@@ -1,12 +1,138 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="et">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
-    <title>Document</title>
+    <meta charset="utf-8" />
+    <title>Kirill Razmustov - Portfoolio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-    <h1>Tuleb varsti</h1>
+    <header class="site-header">
+        <nav class="nav">
+            <div class="brand">K.Razmustov</div>
+            <ul class="menu">
+                <li><a href="#about">Minust</a></li>
+                <li><a href="works.html">Tööd</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="mailto:your@email.com" class="button-secondary">Kontakt</a>
+                <a href="https://github.com/lixaal1" target="_blank" rel="noreferrer" class="button-link">GitHub</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="page-shell">
+        <section class="hero">
+            <div class="hero-copy">
+                <span class="eyebrow">Veebidisain ja front-end</span>
+                <h1 class="title">Portfoolio</h1>
+                <p class="lead">Teen puhta ja kiire front-endi, kus detailid ei karju, aga mõjuvad. Figma ideed, selge struktuur ja pehme neoonglow on siin ühe süsteemina koos.</p>
+                <div class="hero-actions">
+                    <a href="works.html" class="button-link">Vaata töid</a>
+                    <a href="#about" class="button-secondary">Minust</a>
+                </div>
+                <div class="section-grid">
+                    <div class="stat">
+                        <strong>8 projekti</strong>
+                        <span>eraldi Tööd lehel, kaasa arvatud Neural-Synth</span>
+                    </div>
+                    <div class="stat">
+                        <strong>Minimal UI</strong>
+                        <span>madal müra, tugev hierarhia ja selge lugemine</span>
+                    </div>
+                    <div class="stat">
+                        <strong>Glow detailid</strong>
+                        <span>pehmed valgused ja tugev kontrast ilma ülekülluseta</span>
+                    </div>
+                </div>
+            </div>
+
+            <article class="hero-panel" id="about">
+                <div class="profile-top">
+                    <img src="https://cdn.pixabay.com/photo/2025/06/11/13/19/ai-generated-9654480_1280.png" alt="Avatar" class="avatar" />
+                    <div class="profile-meta">
+                        <span class="eyebrow">#veebilooja</span>
+                        <h2>Kirill Razmustov</h2>
+                        <p>Disainin ja ehitan veebilehti, mis näevad modernsed välja ning tunduvad kasutades kerged.</p>
+                    </div>
+                </div>
+                <p class="section-copy">Mulle sobib minimalism, kus ruum, tüpograafia ja kontrast teevad suure osa tööst ära. Glow jääb alles, aga kontrollitud kujul, et leht oleks puhas, mitte lärmakas.</p>
+                <a href="https://github.com/lixaal1" target="_blank" rel="noreferrer" class="button-link">Ava GitHub</a>
+            </article>
+        </section>
+
+        <section class="section" aria-labelledby="works-preview-title">
+            <div class="section-header">
+                <div>
+                    <span class="eyebrow">Projektid</span>
+                    <h2 class="section-title" id="works-preview-title">Tööd on eraldi, avaleht jääb puhtaks</h2>
+                    <p class="section-copy">Projektid elavad oma lehel, nii et avaleht saab keskenduda identiteedile. Seal on Figma tööd ja interaktiivsed veebiprojektid, sealhulgas DrawApp ja Neural-Synth, ühes selges vaates.</p>
+                </div>
+                <a href="works.html" class="text-link">Ava kõik tööd</a>
+            </div>
+
+            <div class="preview-grid">
+                <div class="preview-card">
+                    <strong class="section-title">Valitud suund</strong>
+                    <p class="section-copy">Pehme glow, tumedad pinnad, tugev tekst ja võimalikult vähe liigseid elemente. See hoiab kogu lehe kaasaegsena ka siis, kui sisu kasvab.</p>
+                    <div class="preview-list">
+                        <div class="preview-item">
+                            <strong>Dribble Design</strong>
+                            <span>Portfoolio visuaalne suund ja presentatsioon.</span>
+                        </div>
+                        <div class="preview-item">
+                            <strong>FoodApp seeria</strong>
+                            <span>Kaks mobiilse UX-i ja UI kontseptsiooni.</span>
+                        </div>
+                        <div class="preview-item">
+                            <strong>DrawApp</strong>
+                            <span>Interaktiivne väike veebirakendus.</span>
+                        </div>
+                        <div class="preview-item">
+                            <strong>Neural-Synth</strong>
+                            <span>Visuaalne muusikainstrument, kus joonistamine loob heli.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mini-visual">
+                    <div class="label">Current mood</div>
+                    <div class="big-number">01</div>
+                    <p class="small-copy">Minimalism, mis ei tundu tühi. Glow, mis ei muutu lärmakaks. Selge navigeerimine, tugevad CTA-d ja kontrollitud kontrast.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" aria-labelledby="approach-title">
+            <div class="section-header">
+                <div>
+                    <span class="eyebrow">Lähenemine</span>
+                    <h2 class="section-title" id="approach-title">Miks see töötab</h2>
+                </div>
+            </div>
+
+            <div class="info-grid">
+                <article class="info-card">
+                    <h3>Selge hierarhia</h3>
+                    <p>Suur pealkiri, vähem kõrvalist müra ja nähtavad tegevused annavad lehele kohe fookuse.</p>
+                </article>
+                <article class="info-card">
+                    <h3>Pehme glow</h3>
+                    <p>Valgus on jäetud aktsendiks, mitte põhiteemaks. See hoiab tulemuse puhta ja moodsa.</p>
+                </article>
+                <article class="info-card">
+                    <h3>Eraldi Tööd leht</h3>
+                    <p>Avaleht tutvustab sind, projektileht näitab tööde valikut. Mõlemad lehed teevad ühte asja hästi.</p>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        © 2026 Kirill Razmustov - tehtud CSS-i ja Figma vastu huviga
+    </footer>
 </body>
 </html>
