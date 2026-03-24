@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pixel Puzzle</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Bebas+Neue&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="confettiCanvas" aria-hidden="true"></canvas>
+
+  <header class="app-header">
+    <div>
+      <h1 id="gameTitle">Pixel Puzzle</h1>
+      <p class="subtitle">Lohista, sobita ja võida.</p>
+    </div>
+  </header>
+
+  <main class="layout">
+    <aside class="controls-panel">
+      <label class="control-group upload-btn">
+        <span>Upload photo</span>
+        <input id="imageInput" type="file" accept="image/*" />
+      </label>
+
+      <button id="cameraBtn" class="btn secondary">Kaamera</button>
+      <button id="captureBtn" class="btn secondary" disabled>Tee pilt</button>
+      <video id="cameraPreview" autoplay playsinline muted></video>
+
+      <div class="control-group">
+        <label for="difficulty">Raskusaste</label>
+        <select id="difficulty">
+          <option value="3">3 x 3</option>
+          <option value="4" selected>4 x 4</option>
+          <option value="5">5 x 5</option>
+          <option value="10">10 x 10</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label for="shapeMode">Tüki kuju</label>
+        <select id="shapeMode">
+          <option value="square" selected>Ruut</option>
+          <option value="triangle">Kolmnurk</option>
+          <option value="polygon">Juhuslik hulknurk</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label for="musicSelect">Taustamuusika</label>
+        <select id="musicSelect">
+          <option value="off">Väljas</option>
+          <option value="ambient1">Ambient 1</option>
+          <option value="ambient2">Ambient 2</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <button id="ghostBtn" class="btn secondary">Vaata</button>
+        <button id="sliceBtn" class="btn primary">Cut into puzzles</button>
+      </div>
+
+      <div class="stats">
+        <p>Aeg: <strong id="timer">0.0s</strong></p>
+        <p>Parim: <strong id="bestRecord">-</strong></p>
+      </div>
+
+      <div class="leaderboard">
+        <h2>Liidrite tabel</h2>
+        <ol id="leaderboardList"></ol>
+        <button id="exportRecordsBtn" class="btn secondary">Lae rekordid JSON</button>
+      </div>
+    </aside>
+
+    <section class="game-panel">
+      <div class="board-section">
+        <h2>Assembly field</h2>
+        <div id="assemblyField" class="assembly-field">
+          <img id="ghostImage" alt="Ghost hint" />
+        </div>
+      </div>
+
+      <div class="preview-section">
+        <h2>Original image</h2>
+        <div class="preview-frame">
+          <img id="originalPreview" alt="Original" />
+        </div>
+      </div>
+
+      <div class="storage-section">
+        <h2>Storage</h2>
+        <div id="storage" class="storage"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
