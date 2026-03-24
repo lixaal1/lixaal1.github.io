@@ -1,0 +1,19 @@
+{
+  "name": "turvamees-motion-alarm",
+  "version": "1.0.0",
+  "description": "Kaamera liikumisele reageeriv Node.js veebirakendus",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "camera",
+    "motion",
+    "alarm"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

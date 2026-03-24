@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="et">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Turvamees - Liikumise Häire</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Bungee&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="background-orb orb-a"></div>
+    <div class="background-orb orb-b"></div>
+
+    <main class="app-shell">
+      <header>
+        <p class="eyebrow">Nutikas valve</p>
+        <h1>Turvamees</h1>
+        <p class="subtitle">
+          Vaata kaamerasse ja liiguta eset. Iga liikumise suund mängib oma heli.
+        </p>
+      </header>
+
+      <section class="controls card">
+        <button id="startBtn">Käivita kaamera</button>
+        <button id="stopBtn" disabled>Peata kaamera</button>
+        <div class="status-row">
+          <strong>Seis:</strong>
+          <span id="statusText">Kaamera ootab käivitamist</span>
+        </div>
+      </section>
+
+      <section class="camera-grid">
+        <article class="card">
+          <h2>Kaamera pilt</h2>
+          <video id="video" autoplay playsinline muted></video>
+        </article>
+
+        <article class="card">
+          <h2>Liikumise kaart</h2>
+          <canvas id="motionCanvas" width="640" height="480"></canvas>
+        </article>
+      </section>
+
+      <section class="card activity">
+        <h2>Viimane tuvastatud liikumine</h2>
+        <p id="lastMovement">Veel pole liikumist nähtud.</p>
+        <ul id="movementLegend">
+          <li><span class="dot left"></span> Vasakule - madal kaksiktoon</li>
+          <li><span class="dot right"></span> Paremale - ere kaksiktoon</li>
+          <li><span class="dot up"></span> Ules - kiire piiks</li>
+          <li><span class="dot down"></span> Alla - raske piiks</li>
+          <li><span class="dot back"></span> Tagasi - hoiatav sireen</li>
+          <li><span class="dot forward"></span> Edasi - kasvav heli</li>
+        </ul>
+      </section>
+
+      <section class="card">
+        <h2>Portfoolio</h2>
+        <p>
+          Lisa siia enda portfoolio avaleht:
+          <a href="https://your-portfolio.example.com" target="_blank" rel="noreferrer">
+            https://your-portfolio.example.com
+          </a>
+        </p>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
